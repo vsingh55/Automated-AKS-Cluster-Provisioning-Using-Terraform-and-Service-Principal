@@ -96,7 +96,7 @@ Code="Forbidden" Message="Caller is not authorized to perform
 
 Ensure the user has the Key Vault Administrator role, even if the user has the Owner role. -->
 
-## Blog Reference
+## Blog 🖥️
 
 Check out the Blog below for detailed desscription of this project: click here
 

@@ -1,1 +1,4 @@
 doc.txt
+.terraform
+.terraform*
+*.tfvars
