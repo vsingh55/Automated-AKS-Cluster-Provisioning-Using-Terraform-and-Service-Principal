@@ -9,20 +9,6 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled    = false
   sku_name                    = "premium"
   soft_delete_retention_days  = 7
-  enable_rbac_authorization   = true //alternate of secret policy
+  enable_rbac_authorization   = true
+
 }
-
-
-# # Store the Service Principal client ID in Key Vault
-# resource "azurerm_key_vault_secret" "client_id" {
-#   name         = "service-principal-client-id"
-#   value        = var.client_id
-#   key_vault_id = azurerm_key_vault.kv.id
-# }
-
-# # Store the Service Principal client secret in Key Vault
-# resource "azurerm_key_vault_secret" "client_secret" {
-#   name         = "service-principal-client-secret"
-#   value        = var.client_secret
-#   key_vault_id = azurerm_key_vault.kv.id
-# }

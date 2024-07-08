@@ -20,9 +20,9 @@ module "ServicePrincipal" {
 
 resource "azurerm_role_assignment" "rolespn" {
 
-  scope                = "/subscriptions/e9ff9017-58da-4178-b91a-d1291ce1e572" //replace subscription id ${var.subscription_id}
+  scope                = "/subscriptions/${var.subscription_id}" 
   role_definition_name = "Contributor"
-  principal_id         = module.ServicePrincipal.service_principal_application_id
+  principal_id         = module.ServicePrincipal.service_principal_object_id
   description          = "Role Based Access Control Administrator role assignment with owener permission"
 
   depends_on = [
@@ -47,79 +47,60 @@ module "keyvault" {
   ]
 }
 
-# resource "azurerm_role_assignment" "keyvault_secret_officer" {
-#   principal_id          = data.azuread_service_principal.main.object_id
-#   role_definition_name  = "Key Vault Secrets Officer"
-#   scope                 = azurerm_key_vault.kv.id
-# }
+resource "azurerm_role_assignment" "User_Access_Administrator" {
+  principal_id   = module.ServicePrincipal.service_principal_object_id
+  role_definition_name = "User Access Administrator"
+  scope          = module.keyvault.keyvault_id
+}
 
 
-# resource "azurerm_role_assignment" "role-secret-officer" {
-#   role_definition_name = "Key Vault Secrets Officer"
-#   principal_id         = module.ServicePrincipal.service_principal_object_id
-#   scope                = module.keyvault.keyvault_id
+# Store client_id and Client_secret in Key_vault
+resource "azurerm_key_vault_secret" "spn_secret" {
+  name         = module.ServicePrincipal.client_id
+  value        = module.ServicePrincipal.client_secret
+  key_vault_id = module.keyvault.keyvault_id
 
-#   # depends_on = [module.keyvault, module.ServicePrincipal]
-# }
+  depends_on = [
+    module.keyvault, azurerm_role_assignment.keyvault_secret_officer
+  ]
+}
 
+resource "azurerm_role_assignment" "role-secret-user" {
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = module.ServicePrincipal.service_principal_object_id
+  scope                = "${module.keyvault.keyvault_id}/secrets/${azurerm_key_vault_secret.spn_secret.name}"
+  
+}
 
-# # resource "azurerm_key_vault_secret" "database-password" {
-# #   name         = var.secret_name
-# #   value        = var.secret_value
-# #   key_vault_id = azurerm_key_vault.keyvault.id
+resource "azurerm_role_assignment" "key_vault_administrator" {
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = module.ServicePrincipal.service_principal_object_id
+  scope                = module.keyvault.keyvault_id
 
-# #   depends_on = [azurerm_role_assignment.role-secret-officer]
-# # }
-
-# resource "azurerm_key_vault_secret" "spn_secret" {
-#   name         = module.ServicePrincipal.client_id
-#   value        = module.ServicePrincipal.client_secret
-#   key_vault_id = module.keyvault.keyvault_id
-
-#   depends_on = [
-#     module.keyvault
-#   ]
-# }
-# resource "azurerm_role_assignment" "role-secret-user" {
-#   role_definition_name = "Key Vault Secrets User"
-#   principal_id         = module.ServicePrincipal.service_principal_object_id
-#   scope                = "${module.keyvault.keyvault_id}/secrets/${azurerm_key_vault_secret.spn_secret.name}"
-#   // scope                = "/subscriptions/xxxxxxxxx/resourceGroups/kv_rbac_terraform_rg/providers
-#   //                         /Microsoft.KeyVault/vaults/demokv01093/secrets/MySecret"
-#   // scope                = azurerm_key_vault_secret.database-password.id
-# }
-
-# # resource "azurerm_role_assignment" "key_vault_administrator" {
-# #   role_definition_name = "Key Vault Administrator"
-# #   principal_id         = module.ServicePrincipal.service_principal_object_id
-# #   scope                = module.keyvault.keyvault_id
-
-# #   # "/subscriptions/e9ff9017-58da-4178-b91a-d1291ce1e572/resourceGroups/AKS-KV-Using-TF-SP/providers/Microsoft.KeyVault/vaults/kv-vsingh55"
-
-# #   depends_on = [
-# #     module.keyvault
-# #   ]
-# # }
+  depends_on = [
+    module.keyvault
+  ]
+}
 
 
 
-# #create Azure Kubernetes Service
-# module "aks" {
-#   source                 = "./modules/aks/"
-#   service_principal_name = var.service_principal_name
-#   client_id              = module.ServicePrincipal.client_id
-#   client_secret          = module.ServicePrincipal.client_secret
-#   location               = var.location
-#   resource_group_name    = var.rgname
+#create Azure Kubernetes Service
+module "aks" {
+  source                 = "./modules/aks/"
+  service_principal_name = var.service_principal_name
+  client_id              = module.ServicePrincipal.client_id
+  client_secret          = module.ServicePrincipal.client_secret
+  location               = var.location
+  resource_group_name    = var.rgname
 
-#   depends_on = [
-#     module.ServicePrincipal
-#   ]
+  depends_on = [
+    module.ServicePrincipal
+  ]
 
-# }
+}
 
-# resource "local_file" "kubeconfig" {
-#   depends_on = [module.aks]
-#   filename   = "./kubeconfig"
-#   content    = module.aks.config
-# }
+resource "local_file" "kubeconfig" {
+  depends_on = [module.aks]
+  filename   = "./kubeconfig"
+  content    = module.aks.config
+}
