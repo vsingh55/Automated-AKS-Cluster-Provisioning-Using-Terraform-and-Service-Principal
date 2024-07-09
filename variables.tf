@@ -26,3 +26,8 @@ variable "subscription_id" {
 variable "scope" {
   type = string
 }
+
+variable "storage_account_name" {
+  description = "The name of storage account created for backend"
+  type = string
+}

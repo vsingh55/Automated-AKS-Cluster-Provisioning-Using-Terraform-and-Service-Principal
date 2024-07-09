@@ -23,7 +23,7 @@ resource "azurerm_role_assignment" "rolespn" {
   scope                = "/subscriptions/${var.subscription_id}" 
   role_definition_name = "Contributor"
   principal_id         = module.ServicePrincipal.service_principal_object_id
-  description          = "Role Based Access Control Administrator role assignment with owener permission"
+  description          = "Role Based Access Control, Contributor role assignment to ServicePrincipal"
 
   depends_on = [
     module.ServicePrincipal
@@ -47,13 +47,6 @@ module "keyvault" {
   ]
 }
 
-resource "azurerm_role_assignment" "User_Access_Administrator" {
-  principal_id   = module.ServicePrincipal.service_principal_object_id
-  role_definition_name = "User Access Administrator"
-  scope          = module.keyvault.keyvault_id
-}
-
-
 # Store client_id and Client_secret in Key_vault
 resource "azurerm_key_vault_secret" "spn_secret" {
   name         = module.ServicePrincipal.client_id
@@ -61,24 +54,7 @@ resource "azurerm_key_vault_secret" "spn_secret" {
   key_vault_id = module.keyvault.keyvault_id
 
   depends_on = [
-    module.keyvault, azurerm_role_assignment.keyvault_secret_officer
-  ]
-}
-
-resource "azurerm_role_assignment" "role-secret-user" {
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.ServicePrincipal.service_principal_object_id
-  scope                = "${module.keyvault.keyvault_id}/secrets/${azurerm_key_vault_secret.spn_secret.name}"
-  
-}
-
-resource "azurerm_role_assignment" "key_vault_administrator" {
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = module.ServicePrincipal.service_principal_object_id
-  scope                = module.keyvault.keyvault_id
-
-  depends_on = [
-    module.keyvault
+    module.keyvault, 
   ]
 }
 

@@ -1,5 +1,4 @@
 doc.txt
 .terraform
 .terraform*
-*.tfvars
-kubeconfig
+
