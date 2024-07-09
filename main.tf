@@ -23,7 +23,6 @@ resource "azurerm_role_assignment" "rolespn" {
   scope                = "/subscriptions/${var.subscription_id}" 
   role_definition_name = "Contributor"
   principal_id         = module.ServicePrincipal.service_principal_object_id
-  description          = "Role Based Access Control, Contributor role assignment to ServicePrincipal"
 
   depends_on = [
     module.ServicePrincipal
