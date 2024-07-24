@@ -62,6 +62,9 @@ Automate the scaling of your AKS clusters based on workload demands. This allows
 
 ![AKS-TF-2024-07-24-175100](https://github.com/user-attachments/assets/818187ab-c193-4912-91e1-ce08c494774d)
 
+**Flow CHart:**
+![Untitled diagram-2024-07-24-215305](https://github.com/user-attachments/assets/360b9593-0fc5-40eb-8b95-8fe4a892e8df)
+
 
 ## How to use:
 
