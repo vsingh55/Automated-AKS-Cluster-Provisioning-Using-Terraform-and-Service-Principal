@@ -27,3 +27,4 @@ output "client_secret" {
   value       = azuread_service_principal_password.main.value
 
 }
+

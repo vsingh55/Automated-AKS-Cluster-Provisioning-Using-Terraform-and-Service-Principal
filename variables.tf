@@ -5,8 +5,8 @@ variable "rgname" {
 }
 
 variable "location" {
-  type    = string
-  default = "canadacentral"
+  description = "The location of the resources."
+  type        = string
 }
 
 variable "service_principal_name" {
@@ -25,4 +25,9 @@ variable "subscription_id" {
 }
 variable "scope" {
   type = string
+}
+
+variable "log_analytics_workspace_name" {
+  description = "The name of the Log Analytics Workspace."
+  type        = string
 }

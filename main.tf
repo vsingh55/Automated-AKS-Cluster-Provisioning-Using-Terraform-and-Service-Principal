@@ -59,7 +59,7 @@ resource "azurerm_key_vault_secret" "spn_secret" {
 
 
 
-#create Azure Kubernetes Service
+# Create Azure Kubernetes Service
 module "aks" {
   source                 = "./modules/aks/"
   service_principal_name = var.service_principal_name
@@ -78,4 +78,17 @@ resource "local_file" "kubeconfig" {
   depends_on = [module.aks]
   filename   = "./kubeconfig"
   content    = module.aks.config
+}
+
+# Add monitoring for the AKS cluster
+module "monitoring" {
+  source                      = "./modules/monitoring"
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+  location                    = var.location
+  resource_group_name         = var.rgname
+  aks_cluster_id              = module.aks.cluster_id
+
+  depends_on = [
+    module.aks
+  ]
 }
