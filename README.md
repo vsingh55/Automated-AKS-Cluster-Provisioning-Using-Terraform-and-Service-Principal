@@ -101,4 +101,4 @@ terraform apply --auto-approve
 
 ## Blog 🖥️
 
-Check out the Blog below for detailed desscription of this project: [click here](https://blogs.vijaysingh.cloud/automate-aks)
+Check out the Blog below for detailed desscription of this project: [click here](https://blogs.vijaysingh.cloud/automated-aks-cluster-provisioning-using-terraform-and-service-principal)
